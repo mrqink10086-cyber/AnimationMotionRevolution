@@ -1,0 +1,44 @@
+{
+  "target": "Skyrim 1.6.1170 / SKSE 2.2.6",
+  "revision": "2026-11-08 safety audit",
+  "sha256": "bf4170e6767354cce459d3e1929a4e2ba345ac69ea44b7fa1216d52353761340",
+  "bytes": 690176,
+  "exports": {
+    "SKSEPlugin_Load": "0x307b0",
+    "SKSEPlugin_Query": "0x31180",
+    "SKSEPlugin_Version": "0xa0280"
+  },
+  "imports": [
+    "KERNEL32.dll",
+    "MSVCP140.dll",
+    "VCRUNTIME140.dll",
+    "VCRUNTIME140_1.dll",
+    "api-ms-win-crt-heap-l1-1-0.dll",
+    "api-ms-win-crt-string-l1-1-0.dll",
+    "api-ms-win-crt-runtime-l1-1-0.dll",
+    "api-ms-win-crt-math-l1-1-0.dll",
+    "api-ms-win-crt-locale-l1-1-0.dll",
+    "api-ms-win-crt-convert-l1-1-0.dll",
+    "api-ms-win-crt-stdio-l1-1-0.dll",
+    "api-ms-win-crt-filesystem-l1-1-0.dll",
+    "api-ms-win-crt-time-l1-1-0.dll",
+    "ole32.dll",
+    "VERSION.dll",
+    "USER32.dll",
+    "SHELL32.dll"
+  ],
+  "runtime": "0x1064920",
+  "minimum_skse": "0x2020060",
+  "host_tests": "5/5 pass",
+  "asan_host_tests": [
+    "motion: pass",
+    "cache: pass",
+    "interpolation: pass"
+  ],
+  "in_game_tested": false,
+  "unverified": [
+    "ground state sharing and scheduling",
+    "Havok last-reference destructor thread",
+    "all engine graph writers and handle lock ordering"
+  ]
+}

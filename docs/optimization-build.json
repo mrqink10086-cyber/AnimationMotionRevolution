@@ -1,0 +1,31 @@
+{
+  "target": "Skyrim 1.6.1170 / SKSE 2.2.6",
+  "sha256": "1681c0b4fd047841b2bec42e0d1014d200f7cc37ca857bb91f792c9935176176",
+  "bytes": 683520,
+  "exports": {
+    "SKSEPlugin_Load": "0x2f780",
+    "SKSEPlugin_Query": "0x30140",
+    "SKSEPlugin_Version": "0x9e280"
+  },
+  "imports": [
+    "KERNEL32.dll",
+    "MSVCP140.dll",
+    "VCRUNTIME140.dll",
+    "VCRUNTIME140_1.dll",
+    "api-ms-win-crt-heap-l1-1-0.dll",
+    "api-ms-win-crt-string-l1-1-0.dll",
+    "api-ms-win-crt-runtime-l1-1-0.dll",
+    "api-ms-win-crt-math-l1-1-0.dll",
+    "api-ms-win-crt-locale-l1-1-0.dll",
+    "api-ms-win-crt-convert-l1-1-0.dll",
+    "api-ms-win-crt-stdio-l1-1-0.dll",
+    "api-ms-win-crt-filesystem-l1-1-0.dll",
+    "api-ms-win-crt-time-l1-1-0.dll",
+    "ole32.dll",
+    "VERSION.dll",
+    "USER32.dll",
+    "SHELL32.dll"
+  ],
+  "host_tests": "3/3 pass",
+  "in_game_tested": false
+}

@@ -1,0 +1,8 @@
+/build/
+/dist/
+.vs/
+x64/
+*.obj
+*.pdb
+*.exe
+*.log
