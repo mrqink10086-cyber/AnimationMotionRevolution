@@ -11,17 +11,28 @@
 #include <string_view>
 #include <unordered_map>
 #include <vector>
+#include <variant>
 
 namespace amr
 {
-    template <class Data, class GraphOwner = std::shared_ptr<const void>>
+    // Runtime is created once per activation, while Data is shared by the parsed
+    // LRU. Callers own runtime synchronization and may retain a BindingView after
+    // deactivation; that view keeps both the immutable data and mutable state alive.
+    template <class Data, class GraphOwner = std::shared_ptr<const void>, class Runtime = std::monostate>
     class MotionCache
     {
     public:
         using Snapshot = std::shared_ptr<const Data>;
+        using RuntimeOwner = std::shared_ptr<Runtime>;
         using Generation = std::uint64_t;
         static constexpr std::size_t parsedCapacity = 32;
         static constexpr std::size_t shardCount = 16;
+
+        struct BindingView
+        {
+            Snapshot data;
+            RuntimeOwner runtime;
+        };
 
         [[nodiscard]] Generation GetGeneration() const noexcept
         {
@@ -68,11 +79,13 @@ namespace amr
             std::string_view a_clip, const void* a_animation, Snapshot a_data, Generation a_generation,
             const void* a_generator = nullptr)
         {
+            auto runtime = std::make_shared<Runtime>();
             CharacterEntry incoming;
             incoming.graph = a_graph;
             incoming.owner = std::move(a_graphOwner);
-            incoming.clips.emplace(std::string(a_clip), std::vector<Binding>{ { a_animation, a_generator, a_data } });
+            incoming.clips.emplace(std::string(a_clip), std::vector<Binding>{ { a_animation, a_generator, a_data, runtime } });
             CharacterEntry retired;
+            std::vector<Binding> retiredBindings;
             auto& shard = GetShard(a_character);
             std::lock_guard guard(shard.mutex);
             if (GetGeneration() != a_generation) {
@@ -90,7 +103,24 @@ namespace amr
             if (clip == clips.end()) {
                 clips.insert(incoming.clips.extract(incoming.clips.begin()));
             } else {
-                clip->second.push_back(Binding{ a_animation, a_generator, a_data });
+                auto& bindings = clip->second;
+                if (a_generator) {
+                    // Reserve before mutating so an allocation failure leaves the
+                    // existing binding stack intact. Same-animation activations
+                    // remain counted; changed animations replace this generator's
+                    // former records.
+                    bindings.reserve(bindings.size() + 1);
+                    retiredBindings.reserve(bindings.size());
+                    for (auto binding = bindings.begin(); binding != bindings.end();) {
+                        if (binding->generator == a_generator && binding->animation != a_animation) {
+                            retiredBindings.push_back(std::move(*binding));
+                            binding = bindings.erase(binding);
+                        } else {
+                            ++binding;
+                        }
+                    }
+                }
+                clip->second.push_back(Binding{ a_animation, a_generator, a_data, std::move(runtime) });
             }
         }
 
@@ -104,6 +134,100 @@ namespace amr
             }
             const auto clip = character->second.clips.find(a_clip);
             return clip == character->second.clips.end() || clip->second.empty() ? Snapshot{} : clip->second.back().data;
+        }
+
+        [[nodiscard]] BindingView LookupBinding(const void* a_character, const void* a_graph, std::string_view a_clip)
+        {
+            auto& shard = GetShard(a_character);
+            std::lock_guard guard(shard.mutex);
+            const auto character = shard.characters.find(a_character);
+            if (character == shard.characters.end() || character->second.graph != a_graph) {
+                return {};
+            }
+            const auto clip = character->second.clips.find(a_clip);
+            if (clip == character->second.clips.end() || clip->second.empty()) {
+                return {};
+            }
+            const auto& binding = clip->second.back();
+            return { binding.data, binding.runtime };
+        }
+
+        [[nodiscard]] BindingView FindBinding(const void* a_character, const void* a_graph, std::string_view a_clip,
+            const void* a_animation, const void* a_generator)
+        {
+            auto& shard = GetShard(a_character);
+            std::lock_guard guard(shard.mutex);
+            const auto character = shard.characters.find(a_character);
+            if (character == shard.characters.end() || character->second.graph != a_graph) {
+                return {};
+            }
+            const auto clip = character->second.clips.find(a_clip);
+            if (clip == character->second.clips.end()) {
+                return {};
+            }
+            const auto& bindings = clip->second;
+            const auto binding = std::find_if(bindings.rbegin(), bindings.rend(), [=](const Binding& a_entry) {
+                return a_entry.animation == a_animation && a_entry.generator == a_generator;
+            });
+            return binding == bindings.rend() ? BindingView{} : BindingView{ binding->data, binding->runtime };
+        }
+
+        [[nodiscard]] BindingView FindGeneratorBinding(const void* a_character, const void* a_graph,
+            std::string_view a_clip, const void* a_generator)
+        {
+            auto& shard = GetShard(a_character);
+            std::lock_guard guard(shard.mutex);
+            const auto character = shard.characters.find(a_character);
+            if (character == shard.characters.end() || character->second.graph != a_graph) {
+                return {};
+            }
+            const auto clip = character->second.clips.find(a_clip);
+            if (clip == character->second.clips.end()) {
+                return {};
+            }
+            const auto& bindings = clip->second;
+            const auto binding = std::find_if(bindings.rbegin(), bindings.rend(), [=](const Binding& a_entry) {
+                return a_entry.generator == a_generator;
+            });
+            return binding == bindings.rend() ? BindingView{} : BindingView{ binding->data, binding->runtime };
+        }
+
+        template <class Predicate>
+        [[nodiscard]] bool HasActive(const void* a_character, Predicate&& a_predicate)
+        {
+            auto& shard = GetShard(a_character);
+            std::lock_guard guard(shard.mutex);
+            const auto character = shard.characters.find(a_character);
+            if (character == shard.characters.end()) {
+                return false;
+            }
+            for (const auto& [clipName, bindings] : character->second.clips) {
+                (void)clipName;
+                for (const auto& binding : bindings) {
+                    if (binding.data && a_predicate(*binding.data)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        [[nodiscard]] std::vector<RuntimeOwner> RuntimeSnapshot()
+        {
+            std::vector<RuntimeOwner> result;
+            for (auto& shard : shards) {
+                std::lock_guard guard(shard.mutex);
+                for (const auto& [character, entry] : shard.characters) {
+                    (void)character;
+                    for (const auto& [clipName, bindings] : entry.clips) {
+                        (void)clipName;
+                        for (const auto& binding : bindings) {
+                            result.push_back(binding.runtime);
+                        }
+                    }
+                }
+            }
+            return result;
         }
 
         void Deactivate(const void* a_character, const void* a_graph, std::string_view a_clip, const void* a_animation,
@@ -143,6 +267,97 @@ namespace amr
             }
         }
 
+        std::vector<RuntimeOwner> DeactivateGenerator(const void* a_character, const void* a_graph, std::string_view a_clip,
+            Generation a_generation, const void* a_generator)
+        {
+            std::vector<RuntimeOwner> retiredRuntimes;
+            std::vector<Binding> retiredBindings;
+            CharacterEntry retiredCharacter;
+            auto& shard = GetShard(a_character);
+            std::lock_guard guard(shard.mutex);
+            if (GetGeneration() != a_generation) {
+                return retiredRuntimes;
+            }
+            const auto character = shard.characters.find(a_character);
+            if (character == shard.characters.end()) {
+                return retiredRuntimes;
+            }
+            if (character->second.graph != a_graph) {
+                std::size_t bindingCount = 0;
+                for (const auto& [name, bindings] : character->second.clips) {
+                    (void)name;
+                    bindingCount += bindings.size();
+                }
+                retiredRuntimes.reserve(bindingCount);
+                for (const auto& [name, bindings] : character->second.clips) {
+                    (void)name;
+                    for (const auto& binding : bindings) {
+                        if (binding.runtime) {
+                            retiredRuntimes.push_back(binding.runtime);
+                        }
+                    }
+                }
+                retiredCharacter = std::move(character->second);
+                shard.characters.erase(character);
+                return retiredRuntimes;
+            }
+            auto& clips = character->second.clips;
+            const auto clip = clips.find(a_clip);
+            if (clip == clips.end()) {
+                return retiredRuntimes;
+            }
+            auto& bindings = clip->second;
+            retiredRuntimes.reserve(bindings.size());
+            retiredBindings.reserve(bindings.size());
+            for (auto binding = bindings.begin(); binding != bindings.end();) {
+                if (binding->generator == a_generator) {
+                    if (binding->runtime) {
+                        retiredRuntimes.push_back(binding->runtime);
+                    }
+                    retiredBindings.push_back(std::move(*binding));
+                    binding = bindings.erase(binding);
+                } else {
+                    ++binding;
+                }
+            }
+            if (bindings.empty()) {
+                clips.erase(clip);
+                if (clips.empty()) {
+                    retiredCharacter = std::move(character->second);
+                    shard.characters.erase(character);
+                }
+            }
+            return retiredRuntimes;
+        }
+
+        template <class Visitor>
+        void RetireCharacter(const void* a_character, Generation a_generation, Visitor&& a_visitor)
+        {
+            typename CharacterMap::node_type retired;
+            auto& shard = GetShard(a_character);
+            {
+                std::lock_guard guard(shard.mutex);
+                if (GetGeneration() != a_generation) {
+                    return;
+                }
+                const auto character = shard.characters.find(a_character);
+                if (character == shard.characters.end()) {
+                    return;
+                }
+                retired = shard.characters.extract(character);
+            }
+            if (retired) {
+                for (const auto& [name, bindings] : retired.mapped().clips) {
+                    (void)name;
+                    for (const auto& binding : bindings) {
+                        if (binding.runtime) {
+                            a_visitor(binding.runtime);
+                        }
+                    }
+                }
+            }
+        }
+
         void Clear()
         {
             std::array<CharacterMap, shardCount> retiredCharacters;
@@ -174,6 +389,7 @@ namespace amr
             const void* animation;
             const void* generator;
             Snapshot data;
+            RuntimeOwner runtime;
         };
         struct Parsed
         {

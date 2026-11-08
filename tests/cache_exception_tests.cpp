@@ -177,7 +177,70 @@ namespace
 		CHECK(reachedSuccess);
 	}
 
-	std::size_t CountAppendAllocations(std::size_t a_existingBindings)
+		void TestCharacterRetirementNeedsNoAllocation()
+		{
+			Cache cache;
+			int character = 1;
+			int graph = 2;
+			int animation = 3;
+			const auto generation = cache.GetGeneration();
+			bool released = false;
+			bool visited = false;
+			cache.Activate(&character, &graph, MakeOwner(1), "clip", &animation,
+				MakeData(31, [&] {
+					CHECK(!cache.Lookup(&character, &graph, "clip"));
+					released = true;
+				}), generation);
+			bool threw = false;
+			ArmFailure(0);
+			try {
+				cache.RetireCharacter(&character, generation, [&](const Cache::RuntimeOwner&) {
+					CHECK(!cache.Lookup(&character, &graph, "clip"));
+					visited = true;
+				});
+			} catch (const std::bad_alloc&) {
+				threw = true;
+			}
+			const auto allocations = DisarmFailure();
+			CHECK(!threw);
+			CHECK(allocations == 0);
+			CHECK(visited && released);
+			CHECK(!cache.HasActive(&character, [](const Data&) { return true; }));
+
+			cache.Clear();
+			auto data = MakeData(32);
+			cache.Activate(&character, &graph, MakeOwner(2), "clip", &animation, data, cache.GetGeneration());
+			cache.RetireCharacter(&character, generation, [](const Cache::RuntimeOwner&) {});
+			CHECK(cache.Lookup(&character, &graph, "clip") == data);
+		}
+
+		void TestFailedRebindRetiresOldAnimation()
+		{
+			Cache cache;
+			int character = 1;
+			int graph = 2;
+			int animationA = 3;
+			int animationB = 4;
+			int generator = 5;
+			const auto generation = cache.GetGeneration();
+			cache.Activate(&character, &graph, MakeOwner(1), "clip", &animationA, MakeData(41), generation, &generator);
+			bool threw = false;
+			ArmFailure(0);
+			try {
+				auto parsed = MakeData(42);
+				cache.Activate(&character, &graph, MakeOwner(2), "clip", &animationB, std::move(parsed), generation, &generator);
+			} catch (const std::bad_alloc&) {
+				threw = true;
+				cache.RetireCharacter(&character, generation, [](const Cache::RuntimeOwner&) {});
+			}
+			const auto allocations = DisarmFailure();
+			CHECK(threw);
+			CHECK(allocations == 1);
+			CHECK(!cache.Lookup(&character, &graph, "clip"));
+			CHECK(!cache.HasActive(&character, [](const Data&) { return true; }));
+		}
+
+		std::size_t CountAppendAllocations(std::size_t a_existingBindings)
 	{
 		Cache cache;
 		int character = 1;
@@ -259,6 +322,8 @@ int main()
 	TestFailedNewCharacterActivationDoesNotRetainOwner();
 	TestFailedGraphReplacementLeavesOldEntryIntact();
 	TestFailedExistingClipAppendReentersAfterUnlock();
+	TestCharacterRetirementNeedsNoAllocation();
+	TestFailedRebindRetiresOldAnimation();
 	if (failures.load() != 0) {
 		std::cerr << failures << " cache exception test(s) failed\n";
 		return 1;

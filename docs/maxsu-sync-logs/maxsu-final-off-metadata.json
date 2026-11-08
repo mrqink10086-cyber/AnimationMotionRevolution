@@ -1,0 +1,38 @@
+{
+  "machine": "0x8664",
+  "size": 751104,
+  "sha256": "d1272bce928fdcf268cc90614bdee6b7f0e2326eb92bbdd58d8707fc63b3be12",
+  "truehud": false,
+  "exports": {
+    "RequestPluginAPI": "0x1afd0",
+    "SKSEPlugin_Load": "0x38a80",
+    "SKSEPlugin_Query": "0x3cab0",
+    "SKSEPlugin_Version": "0xae2b0"
+  },
+  "plugin": {
+    "dataVersion": 1,
+    "version": "0x2000000",
+    "name": "AnimationMotionRevolution",
+    "flags_ex": 2,
+    "flags": 0,
+    "runtimes": [
+      "0x1064920",
+      "0x1000000",
+      "0x1000000",
+      "0x1000000",
+      "0x1000000",
+      "0x1000000",
+      "0x1000000",
+      "0x1000000",
+      "0x1000000",
+      "0x1000000",
+      "0x1000000",
+      "0x1000000",
+      "0x1000000",
+      "0x1000000",
+      "0x1000000",
+      "0x1000000"
+    ],
+    "minimumSKSE": "0x2020060"
+  }
+}

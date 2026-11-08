@@ -91,6 +91,7 @@ namespace hooks
 
 	void SimulateStatePhysics(RE::bhkCharacterStateOnGround* a_this, RE::bhkCharacterController* a_characterController);
 	void ClearMotionCache();
+	[[nodiscard]] bool HasAnimMotionData(const RE::hkbCharacter* a_hkbCharacter) noexcept;
 
 	static inline void Install()
 	{

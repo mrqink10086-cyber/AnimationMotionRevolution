@@ -38,7 +38,12 @@ namespace
 		std::function<void()> onDestroy;
 	};
 
-	using Cache = amr::MotionCache<Data>;
+	struct RuntimeState
+	{
+		int value = 0;
+	};
+
+	using Cache = amr::MotionCache<Data, std::shared_ptr<const void>, RuntimeState>;
 	using Snapshot = Cache::Snapshot;
 
 	Snapshot MakeData(int a_value, std::function<void()> a_onDestroy = {})
@@ -125,6 +130,44 @@ namespace
 		CHECK(Value(heldAcrossClear) == 7);
 	}
 
+	void TestActiveLookupAndPerActivationRuntime()
+	{
+		Cache cache;
+		int character = 1;
+		int graph = 2;
+		int animation = 3;
+		int firstGenerator = 4;
+		int secondGenerator = 5;
+		const auto generation = cache.GetGeneration();
+		auto motion = MakeData(7);
+		auto noMotion = MakeData(-1);
+
+		// Parsed cache entries alone are not active API records.
+		CHECK(cache.Remember(&animation, noMotion, generation));
+		CHECK(!cache.HasActive(&character, [](const Data& a_data) { return a_data.value > 0; }));
+
+		cache.Activate(&character, &graph, MakeOwner(1), "clip", &animation, motion, generation, &firstGenerator);
+		auto first = cache.LookupBinding(&character, &graph, "clip");
+		CHECK(first.data == motion);
+		CHECK(first.runtime);
+		first.runtime->value = 11;
+		CHECK(cache.HasActive(&character, [](const Data& a_data) { return a_data.value > 0; }));
+
+		cache.Activate(&character, &graph, MakeOwner(2), "clip", &animation, motion, generation, &secondGenerator);
+		auto second = cache.LookupBinding(&character, &graph, "clip");
+		CHECK(second.runtime != first.runtime);
+		second.runtime->value = 22;
+		CHECK(second.runtime->value == 22);
+		CHECK(first.runtime->value == 11);
+
+		cache.Deactivate(&character, &graph, "clip", &animation, generation, &secondGenerator);
+		auto restored = cache.LookupBinding(&character, &graph, "clip");
+		CHECK(restored.runtime == first.runtime);
+		cache.Deactivate(&character, &graph, "clip", &animation, generation, &firstGenerator);
+		CHECK(!cache.HasActive(&character, [](const Data& a_data) { return a_data.value > 0; }));
+		CHECK(first.runtime->value == 11); // A retained view pins its runtime through hook completion.
+	}
+
 	void TestActivationCountsWrongAnimationPromotionAndRestore()
 	{
 		Cache cache;
@@ -179,6 +222,90 @@ namespace
 		CHECK(Value(cache.Lookup(&character, &graph, "idle")) == 40);
 		cache.Deactivate(&character, &graph, "idle", &animationB, generation, &generatorRepeated);
 		CHECK(!cache.Lookup(&character, &graph, "idle"));
+	}
+
+	void TestGeneratorRebindRemovesStaleMotion()
+	{
+		Cache cache;
+		int character = 1;
+		int graph = 2;
+		int animationA = 3;
+		int animationB = 4;
+		int generatorA = 5;
+		int generatorB = 6;
+		const auto generation = cache.GetGeneration();
+		auto motionA = MakeData(10);
+		auto motionB = MakeData(20);
+		auto noMotion = MakeData(-1);
+		const auto owner = MakeOwner(1);
+		auto hasMotion = [](const Data& a_data) { return a_data.value > 0; };
+		CHECK(cache.Remember(&animationB, noMotion, generation));
+		CHECK(!cache.HasActive(&character, hasMotion));
+
+		cache.Activate(&character, &graph, owner, "clip", &animationA, motionA, generation, &generatorA);
+		cache.Activate(&character, &graph, owner, "clip", &animationA, motionB, generation, &generatorB);
+		cache.Activate(&character, &graph, owner, "clip", &animationB, motionB, generation, &generatorA);
+		CHECK(!cache.FindBinding(&character, &graph, "clip", &animationA, &generatorA).data);
+		CHECK(Value(cache.Lookup(&character, &graph, "clip")) == 20);
+		CHECK(cache.HasActive(&character, hasMotion));
+
+		// Resetting B must not resurrect A; the other generator remains active.
+		cache.Deactivate(&character, &graph, "clip", &animationB, generation, &generatorA);
+		CHECK(Value(cache.Lookup(&character, &graph, "clip")) == 20);
+		CHECK(cache.HasActive(&character, hasMotion));
+
+		// A no-motion rebind removes all records for that generator while leaving
+		// another generator's motion and API-visible active state intact.
+		cache.Activate(&character, &graph, owner, "clip", &animationA, motionA, generation, &generatorA);
+		cache.DeactivateGenerator(&character, &graph, "clip", generation, &generatorA);
+		CHECK(!cache.FindGeneratorBinding(&character, &graph, "clip", &generatorA).data);
+		CHECK(Value(cache.Lookup(&character, &graph, "clip")) == 20);
+		CHECK(cache.HasActive(&character, hasMotion));
+
+		cache.Deactivate(&character, &graph, "clip", &animationA, generation, &generatorB);
+		CHECK(!cache.Lookup(&character, &graph, "clip"));
+		CHECK(!cache.HasActive(&character, hasMotion));
+
+		// With no other generator, a no-motion rebind clears the active API result.
+		cache.Activate(&character, &graph, owner, "clip", &animationA, motionA, generation, &generatorA);
+		CHECK(cache.HasActive(&character, hasMotion));
+		cache.DeactivateGenerator(&character, &graph, "clip", generation, &generatorA);
+		CHECK(!cache.HasActive(&character, hasMotion));
+	}
+
+	void TestGraphReplacementWithNoMotionInvalidatesOldEntry()
+	{
+		Cache cache;
+		int character = 1;
+		int oldGraph = 2;
+		int newGraph = 3;
+		int oldAnimation = 4;
+		int generator = 5;
+		const auto generation = cache.GetGeneration();
+		auto motion = MakeData(10);
+		auto hasMotion = [](const Data& a_data) { return a_data.value > 0; };
+		bool oldOwnerDestroyed = false;
+		std::weak_ptr<const void> oldOwnerLifetime;
+		{
+			auto oldOwner = MakeOwner(1, [&] {
+				CHECK(!cache.HasActive(&character, hasMotion));
+				oldOwnerDestroyed = true;
+			});
+			oldOwnerLifetime = oldOwner;
+			cache.Activate(&character, &oldGraph, std::move(oldOwner), "old", &oldAnimation,
+				motion, generation, &generator);
+		}
+		CHECK(cache.HasActive(&character, hasMotion));
+
+		// Processing a no-motion clip on a replacement graph retires the entire
+		// old CharacterEntry even though the new clip has no binding to activate.
+		const auto retired = cache.DeactivateGenerator(
+			&character, &newGraph, "new", generation, &generator);
+		CHECK(!retired.empty());
+		CHECK(!cache.Lookup(&character, &oldGraph, "old"));
+		CHECK(!cache.HasActive(&character, hasMotion));
+		CHECK(oldOwnerDestroyed);
+		CHECK(oldOwnerLifetime.expired());
 	}
 
 	void TestGraphIdentityAndReplacementOwner()
@@ -334,7 +461,10 @@ int main()
 	TestRememberReturnsOriginalSharedObjectForPositiveAndNegativeData();
 	TestParsedCacheUsesLruAndCapsAt32();
 	TestSnapshotsSurviveDeactivateAndClear();
+	TestActiveLookupAndPerActivationRuntime();
 	TestActivationCountsWrongAnimationPromotionAndRestore();
+	TestGeneratorRebindRemovesStaleMotion();
+	TestGraphReplacementWithNoMotionInvalidatesOldEntry();
 	TestGraphIdentityAndReplacementOwner();
 	TestStaleGenerationRejectsRememberActivateAndDeactivate();
 	TestDestructorCallbacksRunOutsideLocks();

@@ -1,0 +1,19 @@
+[1/19] Building RC object CMakeFiles\AnimationMotionRevolution.dir\version.rc.res
+[2/19] Building CXX object CMakeFiles\amr_warp_tests.dir\tests\warp_tests.cpp.obj
+[3/19] Building CXX object CMakeFiles\amr_motion_tests.dir\tests\motion_tests.cpp.obj
+[4/19] Building CXX object CMakeFiles\amr_cache_exception_tests.dir\tests\cache_exception_tests.cpp.obj
+[5/19] Building CXX object CMakeFiles\amr_cache_tests.dir\tests\cache_tests.cpp.obj
+[6/19] Linking CXX executable amr_warp_tests.exe
+[7/19] Linking CXX executable amr_motion_tests.exe
+[8/19] Linking CXX executable amr_cache_exception_tests.exe
+[9/19] Linking CXX executable amr_cache_tests.exe
+[10/19] Building CXX object CMakeFiles\AnimationMotionRevolution.dir\cmake_pch.cxx.obj
+[11/19] Building CXX object CMakeFiles\AnimationMotionRevolution.dir\source\pch.cpp.obj
+[12/19] Building CXX object CMakeFiles\AnimationMotionRevolution.dir\__AnimationMotionRevolutionPlugin.cpp.obj
+[13/19] Building CXX object CMakeFiles\AnimationMotionRevolution.dir\source\TrueHUDIntegration.cpp.obj
+[14/19] Building CXX object CMakeFiles\AnimationMotionRevolution.dir\source\Settings.cpp.obj
+[15/19] Building CXX object CMakeFiles\AnimationMotionRevolution.dir\source\AnimationMotionRevolutionAPI.cpp.obj
+[16/19] Building CXX object CMakeFiles\AnimationMotionRevolution.dir\source\PhysicsHooks.cpp.obj
+[17/19] Building CXX object CMakeFiles\AnimationMotionRevolution.dir\source\Hooks.cpp.obj
+[18/19] Building CXX object CMakeFiles\AnimationMotionRevolution.dir\source\main.cpp.obj
+[19/19] Linking CXX shared library AnimationMotionRevolution.dll
