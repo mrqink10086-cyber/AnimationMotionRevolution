@@ -1,0 +1,7 @@
+keys=2 linear_ms=2.3101 new_sampler_ms=2.1373 checksum_delta=0
+keys=4 linear_ms=2.4436 new_sampler_ms=2.5594 checksum_delta=0
+keys=8 linear_ms=2.8646 new_sampler_ms=2.8318 checksum_delta=0
+keys=16 linear_ms=3.2811 new_sampler_ms=3.5028 checksum_delta=0
+keys=32 linear_ms=4.136 new_sampler_ms=4.2015 checksum_delta=0
+keys=64 linear_ms=5.975 new_sampler_ms=6.1526 checksum_delta=0
+keys=128 linear_ms=8.5848 new_sampler_ms=6.9104 checksum_delta=0

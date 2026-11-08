@@ -1,0 +1,15 @@
+Test project E:/source/repos/AnimationMotionRevolution-main/build/ae1170-local
+    Start 1: amr_motion
+1/5 Test #1: amr_motion .......................   Passed    0.01 sec
+    Start 2: amr_cache
+2/5 Test #2: amr_cache ........................   Passed    0.01 sec
+    Start 3: amr_cache_exception
+3/5 Test #3: amr_cache_exception ..............   Passed    0.01 sec
+    Start 4: amr_interpolation
+4/5 Test #4: amr_interpolation ................   Passed    0.04 sec
+    Start 5: amr_stack
+5/5 Test #5: amr_stack ........................   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) =   0.08 sec

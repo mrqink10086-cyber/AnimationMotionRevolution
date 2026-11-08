@@ -1,0 +1,14 @@
+Synthetic host cache lookup benchmark; no FPS claims
+Characters: 256, clip-name bytes: 64, measured lookups per thread: 200000, warmup lookups per thread: 20000
+Original shape: nested std::map, global mutex, temporary std::string, one find
+MotionCache shape: sharded lookup returning a shared snapshot
+
+1 thread (disjoint character ranges)
+  original-map: 11.488 ms, checksum 225493856
+  MotionCache: 10.967 ms, checksum 225493856
+  original-map / MotionCache: 1.048x
+
+4 threads (disjoint character ranges)
+  original-map: 43.051 ms, checksum 902000000
+  MotionCache: 28.197 ms, checksum 902000000
+  original-map / MotionCache: 1.527x
