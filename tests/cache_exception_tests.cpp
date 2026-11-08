@@ -240,6 +240,33 @@ namespace
 			CHECK(!cache.HasActive(&character, [](const Data&) { return true; }));
 		}
 
+		void TestFailedActivationRetiresOldAnimation()
+		{
+			Cache cache;
+			int character = 1;
+			int graph = 2;
+			int animationA = 3;
+			int animationB = 4;
+			int generator = 5;
+			const auto generation = cache.GetGeneration();
+			cache.Activate(&character, &graph, MakeOwner(1), "clip", &animationA, MakeData(51), generation, &generator);
+			auto parsed = MakeData(52);
+			auto replacementOwner = MakeOwner(2);
+			bool threw = false;
+			ArmFailure(0);
+			try {
+				cache.Activate(&character, &graph, std::move(replacementOwner), "clip", &animationB, parsed, generation, &generator);
+			} catch (const std::bad_alloc&) {
+				threw = true;
+				cache.RetireCharacter(&character, generation, [](const Cache::RuntimeOwner&) {});
+			}
+			const auto allocations = DisarmFailure();
+			CHECK(threw);
+			CHECK(allocations == 1);
+			CHECK(!cache.Lookup(&character, &graph, "clip"));
+			CHECK(!cache.HasActive(&character, [](const Data&) { return true; }));
+		}
+
 		std::size_t CountAppendAllocations(std::size_t a_existingBindings)
 	{
 		Cache cache;
@@ -324,6 +351,7 @@ int main()
 	TestFailedExistingClipAppendReentersAfterUnlock();
 	TestCharacterRetirementNeedsNoAllocation();
 	TestFailedRebindRetiresOldAnimation();
+	TestFailedActivationRetiresOldAnimation();
 	if (failures.load() != 0) {
 		std::cerr << failures << " cache exception test(s) failed\n";
 		return 1;

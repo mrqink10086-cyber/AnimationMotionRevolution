@@ -54,7 +54,7 @@ virtual bool HasAnimMotionData(const RE::hkbCharacter* a_hkbCharacter) const noe
 
 新增回归覆盖 warp 解析及分段、独立活动状态、motion A→B→reset 不复现 A、无 motion 切换和行为图替换清理。
 缓存测试还通过析构回调确认退休所有权不在分片锁内释放。
-故障注入覆盖重绑定解析分配失败后的清理、零分配摘除、访问与析构回调重新查询缓存，以及过期 generation 不影响新记录。
+故障注入覆盖重绑定解析及激活分配失败后的清理、零分配摘除、访问与析构回调重新查询缓存，以及过期 generation 不影响新记录。
 最终默认开启 TrueHUD 调试，DLL 大小为 756736 字节，SHA-256 为：
 
 ```text

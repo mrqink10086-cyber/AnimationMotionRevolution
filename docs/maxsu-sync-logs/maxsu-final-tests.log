@@ -1,6 +1,6 @@
 Test project E:/source/repos/AnimationMotionRevolution-main/build/ae1170-local
     Start 1: amr_motion
-1/6 Test #1: amr_motion .......................   Passed    0.02 sec
+1/6 Test #1: amr_motion .......................   Passed    0.01 sec
     Start 2: amr_warp
 2/6 Test #2: amr_warp .........................   Passed    0.01 sec
     Start 3: amr_cache
@@ -14,4 +14,4 @@ Test project E:/source/repos/AnimationMotionRevolution-main/build/ae1170-local
 
 100% tests passed, 0 tests failed out of 6
 
-Total Test time (real) =   0.10 sec
+Total Test time (real) =   0.09 sec

@@ -1,0 +1,8 @@
+[1/8] Building CXX object CMakeFiles\amr_warp_tests.dir\tests\warp_tests.cpp.obj
+[2/8] Building CXX object CMakeFiles\amr_motion_tests.dir\tests\motion_tests.cpp.obj
+[3/8] Building CXX object CMakeFiles\amr_cache_exception_tests.dir\tests\cache_exception_tests.cpp.obj
+[4/8] Building CXX object CMakeFiles\amr_cache_tests.dir\tests\cache_tests.cpp.obj
+[5/8] Linking CXX executable amr_warp_tests.exe
+[6/8] Linking CXX executable amr_motion_tests.exe
+[7/8] Linking CXX executable amr_cache_exception_tests.exe
+[8/8] Linking CXX executable amr_cache_tests.exe
