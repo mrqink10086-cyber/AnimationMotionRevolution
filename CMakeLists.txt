@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 
-project(AnimationMotionRevolution VERSION 2.0.1 LANGUAGES CXX)
+project(AnimationMotionRevolution VERSION 2.0.2 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -51,7 +51,7 @@ option(AMR_BUILD_TESTS "Build host motion and cache regression tests" OFF)
 option(AMR_ENABLE_ASAN_TESTS "Instrument host regression tests with AddressSanitizer" OFF)
 if(AMR_BUILD_TESTS)
     enable_testing()
-    foreach(test_name IN ITEMS motion warp cache cache_exception)
+    foreach(test_name IN ITEMS motion warp cache cache_exception physics_event)
         add_executable(amr_${test_name}_tests tests/${test_name}_tests.cpp)
         target_include_directories(amr_${test_name}_tests PRIVATE include)
         if(AMR_ENABLE_ASAN_TESTS AND MSVC)

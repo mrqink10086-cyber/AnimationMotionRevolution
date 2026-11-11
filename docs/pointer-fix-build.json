@@ -1,0 +1,19 @@
+{
+  "version": "2.0.2",
+  "baseCommit": "2d5c052b8bf065402aa934387363cd65ba5e25c0",
+  "runtime": "1.6.1170.0",
+  "minimumSKSE": "2.2.6",
+  "buildType": "RelWithDebInfo",
+  "compiler": "MSVC 19.44.35207 x64",
+  "dllBytes": 756224,
+  "dllSHA256": "88bbe03b77ea0a13c755c5a702191a205d896ed5daff8e4d3555f20bdeb5ee9a",
+  "testsPassed": 9,
+  "testsTotal": 9,
+  "regressionBeforeFix": {
+    "exitCode": 1,
+    "failure": "event.tag.value != nullptr"
+  },
+  "gameTested": false,
+  "deployed": false,
+  "createdUTC": "2026-11-11T10:53:52.061373+00:00"
+}

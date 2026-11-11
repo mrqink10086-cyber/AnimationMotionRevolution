@@ -1,0 +1,149 @@
+Start testing: Nov 11 18:49 中国标准时间
+----------------------------------------------------------
+1/9 Testing: amr_motion
+1/9 Test: amr_motion
+Command: "E:/source/repos/AnimationMotionRevolution-main/build/ae1170-local/amr_motion_tests.exe"
+Directory: E:/source/repos/AnimationMotionRevolution-main/build/ae1170-local
+"amr_motion" start time: Nov 11 18:49 中国标准时间
+Output:
+----------------------------------------------------------
+motion parser and sampling tests passed
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"amr_motion" end time: Nov 11 18:49 中国标准时间
+"amr_motion" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/9 Testing: amr_warp
+2/9 Test: amr_warp
+Command: "E:/source/repos/AnimationMotionRevolution-main/build/ae1170-local/amr_warp_tests.exe"
+Directory: E:/source/repos/AnimationMotionRevolution-main/build/ae1170-local
+"amr_warp" start time: Nov 11 18:49 中国标准时间
+Output:
+----------------------------------------------------------
+warp parser and segment tests passed
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"amr_warp" end time: Nov 11 18:49 中国标准时间
+"amr_warp" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/9 Testing: amr_cache
+3/9 Test: amr_cache
+Command: "E:/source/repos/AnimationMotionRevolution-main/build/ae1170-local/amr_cache_tests.exe"
+Directory: E:/source/repos/AnimationMotionRevolution-main/build/ae1170-local
+"amr_cache" start time: Nov 11 18:49 中国标准时间
+Output:
+----------------------------------------------------------
+MotionCache host tests passed
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"amr_cache" end time: Nov 11 18:49 中国标准时间
+"amr_cache" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/9 Testing: amr_cache_exception
+4/9 Test: amr_cache_exception
+Command: "E:/source/repos/AnimationMotionRevolution-main/build/ae1170-local/amr_cache_exception_tests.exe"
+Directory: E:/source/repos/AnimationMotionRevolution-main/build/ae1170-local
+"amr_cache_exception" start time: Nov 11 18:49 中国标准时间
+Output:
+----------------------------------------------------------
+MotionCache allocation-failure tests passed
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"amr_cache_exception" end time: Nov 11 18:49 中国标准时间
+"amr_cache_exception" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/9 Testing: amr_physics_event
+5/9 Test: amr_physics_event
+Command: "E:/source/repos/AnimationMotionRevolution-main/build/ae1170-local/amr_physics_event_tests.exe"
+Directory: E:/source/repos/AnimationMotionRevolution-main/build/ae1170-local
+"amr_physics_event" start time: Nov 11 18:49 中国标准时间
+Output:
+----------------------------------------------------------
+physics update event fields verified
+<end of output>
+Test time =   0.13 sec
+----------------------------------------------------------
+Test Passed.
+"amr_physics_event" end time: Nov 11 18:49 中国标准时间
+"amr_physics_event" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/9 Testing: amr_interpolation
+6/9 Test: amr_interpolation
+Command: "E:/source/repos/AnimationMotionRevolution-main/build/ae1170-local/amr_benchmark_interpolation.exe"
+Directory: E:/source/repos/AnimationMotionRevolution-main/build/ae1170-local
+"amr_interpolation" start time: Nov 11 18:49 中国标准时间
+Output:
+----------------------------------------------------------
+Host synthetic interpolation, bitwise outputs match; scalar ms=14.3335, SSE ms=5.4363, checksum=-5.90718e+06
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"amr_interpolation" end time: Nov 11 18:49 中国标准时间
+"amr_interpolation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/9 Testing: amr_stack
+7/9 Test: amr_stack
+Command: "E:/source/repos/AnimationMotionRevolution-main/build/ae1170-local/amr_stack_tests.exe"
+Directory: E:/source/repos/AnimationMotionRevolution-main/build/ae1170-local
+"amr_stack" start time: Nov 11 18:49 中国标准时间
+Output:
+----------------------------------------------------------
+Motion trampoline ABI and Windows unwind tests passed
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"amr_stack" end time: Nov 11 18:49 中国标准时间
+"amr_stack" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/9 Testing: amr_trampoline
+8/9 Test: amr_trampoline
+Command: "E:/source/repos/AnimationMotionRevolution-main/build/ae1170-local/amr_trampoline_tests.exe"
+Directory: E:/source/repos/AnimationMotionRevolution-main/build/ae1170-local
+"amr_trampoline" start time: Nov 11 18:49 中国标准时间
+Output:
+----------------------------------------------------------
+7 call sites installed; 352 / 352 bytes, 1 pool request, 4 unwind tables verified
+Trampoline installation passed
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"amr_trampoline" end time: Nov 11 18:49 中国标准时间
+"amr_trampoline" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/9 Testing: amr_trampoline_legacy
+9/9 Test: amr_trampoline_legacy
+Command: "E:/source/repos/AnimationMotionRevolution-main/build/ae1170-local/amr_trampoline_tests.exe" "--legacy"
+Directory: E:/source/repos/AnimationMotionRevolution-main/build/ae1170-local
+"amr_trampoline_legacy" start time: Nov 11 18:49 中国标准时间
+Output:
+----------------------------------------------------------
+[2026-11-11 18:49:49.498] [critical] [Trampoline.cpp:164] Failed to handle allocation request
+Legacy allocation failure reproduced: pool requests=1, capacity=14, used=14
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"amr_trampoline_legacy" end time: Nov 11 18:49 中国标准时间
+"amr_trampoline_legacy" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Nov 11 18:49 中国标准时间

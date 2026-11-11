@@ -1,4 +1,5 @@
 #include "Hooks.h"
+#include "PhysicsEvents.h"
 
 #include <algorithm>
 
@@ -37,7 +38,7 @@ namespace hooks
         }
         if (const auto graph = amr::abi::ActiveGraph(character.get())) {
             RE::BSTEventSource<RE::BSAnimationGraphEvent>* source = graph.get();
-            RE::BSAnimationGraphEvent event{};
+            const auto event = amr::MakePhysicsUpdateEvent(character.get());
             source->SendEvent(&event);
         }
 

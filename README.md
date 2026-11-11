@@ -2,7 +2,7 @@
 
 本地分支已同步作者 `max-su-2019/AnimationMotionRevolution` 的
 [`b5be808`](https://github.com/max-su-2019/AnimationMotionRevolution/commit/b5be808a212f2b124f19d5365a18d1158d24b77b)，
-版本为 **2.0.0**。保留本地 CommonLibSSE-NG 源码构建、共享动画缓存、1170 ABI 修正和生命周期保护，
+本地版本为 **2.0.2**。保留本地 CommonLibSSE-NG 源码构建、共享动画缓存、1170 ABI 修正和生命周期保护，
 并合入作者的攻击位移控制、分段 motion warping、行为图变量、TrueHUD 调试与 V1 查询 API。
 
 ## Runtime support

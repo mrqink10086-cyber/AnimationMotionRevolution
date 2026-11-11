@@ -1,0 +1,370 @@
+SkyrimSE.exe 1.6.1170 native event dispatch
+File: E:\source\repos\valhallaCombat\build\abi\SkyrimSE-1.6.1170.exe.unpacked.exe
+Image base: 0x140000000
+
+Target RVA 0x1ee5c5 (VA 0x1401ee5c5)
+Pdata function range 0x1ee580-0x1ee68c (unwind 0x1c2c3dc)
+Symbol/source mapping: faulting animation graph event tag scan; log frame SkyrimSE.exe+01EE5C5
+  001EE580  push     rsi
+  001EE582  push     rdi
+  001EE583  push     r14
+  001EE585  sub      rsp, 0x140
+  001EE58C  mov      qword ptr [rsp + 0x20], 0xfffffffffffffffe
+  001EE595  mov      qword ptr [rsp + 0x168], rbx
+  001EE59D  mov      r14, rcx
+  001EE5A0  xor      esi, esi
+  001EE5A2  call     0x1401798e0
+  001EE5A7  mov      rdx, rax
+  001EE5AA  lea      rcx, [rsp + 0x160]
+  001EE5B2  call     0x140cec680
+  001EE5B7  nop      
+  001EE5B8  mov      rdi, qword ptr [r14]
+  001EE5BB  mov      rbx, 0xffffffffffffffff
+  001EE5C2  inc      rbx
+  001EE5C5  cmp      byte ptr [rdi + rbx], 0
+  001EE5C9  jne      0x1401ee5c2
+  001EE5CB  cmp      rbx, 4
+  001EE5CF  jbe      0x1401ee668
+  001EE5D5  lea      rcx, [rdi - 4]
+  001EE5D9  add      rcx, rbx
+  001EE5DC  lea      rdx, [rip + 0x159468d]
+  001EE5E3  call     qword ptr [rip + 0x1561b5f]
+  001EE5E9  test     eax, eax
+  001EE5EB  jne      0x1401ee668
+  001EE5ED  lea      r9, [rbx - 4]
+  001EE5F1  lea      rdx, [r9 + 1]
+  001EE5F5  mov      r8, rdi
+  001EE5F8  lea      rcx, [rsp + 0x30]
+  001EE5FD  call     qword ptr [rip + 0x1561b55]
+  001EE603  lea      rdx, [rsp + 0x30]
+  001EE608  lea      rcx, [rsp + 0x170]
+  001EE610  call     0x140cec5d0
+  001EE615  nop      
+  001EE616  lea      rdx, [rsp + 0x170]
+  001EE61E  lea      rcx, [rsp + 0x160]
+  001EE626  call     0x140cec820
+  001EE62B  nop      
+  001EE62C  lea      rcx, [rsp + 0x170]
+  001EE634  call     0x140cec740
+  001EE639  mov      rcx, qword ptr [r14 + 8]
+  001EE63D  test     rcx, rcx
+  001EE640  je       0x1401ee668
+  001EE642  mov      rax, qword ptr [rcx]
+  001EE645  call     qword ptr [rax + 0x228]
+  001EE64B  test     rax, rax
+  001EE64E  je       0x1401ee668
+  001EE650  cmp      dword ptr [rax], 0
+  001EE653  je       0x1401ee668
+  001EE655  lea      rdx, [rsp + 0x160]
+  001EE65D  mov      rcx, rax
+  001EE660  call     0x1401ee7f0
+  001EE665  mov      rsi, rax
+  001EE668  lea      rcx, [rsp + 0x160]
+  001EE670  call     0x140cec740
+  001EE675  mov      rax, rsi
+  001EE678  mov      rbx, qword ptr [rsp + 0x168]
+  001EE680  add      rsp, 0x140
+  001EE687  pop      r14
+  001EE689  pop      rdi
+  001EE68A  pop      rsi
+  001EE68B  ret      
+
+Target RVA 0x6cd3b8 (VA 0x1406cd3b8)
+Pdata function range 0x6cd390-0x6cd3ff (unwind 0x1d61bc8)
+Symbol/source mapping: ActorMediator event sink dispatch; log frame SkyrimSE.exe+06CD3B8
+  006CD390  mov      qword ptr [rsp + 8], rbx
+  006CD395  mov      qword ptr [rsp + 0x10], rbp
+  006CD39A  mov      qword ptr [rsp + 0x18], rsi
+  006CD39F  push     rdi
+  006CD3A0  sub      rsp, 0x20
+  006CD3A4  mov      rbp, rdx
+  006CD3A7  mov      rdi, rcx
+  006CD3AA  mov      rcx, rbp
+  006CD3AD  mov      rdx, r8
+  006CD3B0  mov      rsi, r8
+  006CD3B3  call     0x1401ee580
+  006CD3B8  mov      rbx, rax
+  006CD3BB  test     rax, rax
+  006CD3BE  je       0x1406cd3d9
+  006CD3C0  mov      rdx, rax
+  006CD3C3  mov      rcx, rdi
+  006CD3C6  call     0x1406cd0d0
+  006CD3CB  mov      r9, qword ptr [rbx]
+  006CD3CE  mov      edx, 1
+  006CD3D3  mov      rcx, rbx
+  006CD3D6  call     qword ptr [r9]
+  006CD3D9  mov      rax, qword ptr [rdi + 0x10]
+  006CD3DD  test     rax, rax
+  006CD3E0  je       0x1406cd3ea
+  006CD3E2  mov      rdx, rsi
+  006CD3E5  mov      rcx, rbp
+  006CD3E8  call     rax
+  006CD3EA  mov      rbx, qword ptr [rsp + 0x30]
+  006CD3EF  mov      rbp, qword ptr [rsp + 0x38]
+  006CD3F4  mov      rsi, qword ptr [rsp + 0x40]
+  006CD3F9  add      rsp, 0x20
+  006CD3FD  pop      rdi
+  006CD3FE  ret      
+
+AnimationMotionRevolution.dll old build (preserved with matching PDB)
+File: E:\source\repos\AnimationMotionRevolution-main\build\tmp\AnimationMotionRevolution.dll
+Image base: 0x180000000
+
+Target RVA 0x2d74b (VA 0x18002d74b)
+Pdata function range 0x2d620-0x2d828 (unwind 0xa5924)
+Symbol/source mapping: PDB: RE::BSTEventSource<RE::BSAnimationGraphEvent>::SendEvent; BSTEvent.h:148
+  0002D620  mov      qword ptr [rsp + 0x10], rbx
+  0002D625  mov      qword ptr [rsp + 0x18], rbp
+  0002D62A  mov      qword ptr [rsp + 0x20], rsi
+  0002D62F  push     rdi
+  0002D630  push     r14
+  0002D632  push     r15
+  0002D634  sub      rsp, 0x20
+  0002D638  mov      r15, rdx
+  0002D63B  mov      rbx, rcx
+  0002D63E  lea      rdx, [rcx + 0x48]
+  0002D642  lea      rcx, [rsp + 0x40]
+  0002D647  call     0x180042080
+  0002D64C  nop      
+  0002D64D  movzx    r14d, byte ptr [rbx + 0x50]
+  0002D652  mov      byte ptr [rbx + 0x50], 1
+  0002D656  test     r14b, r14b
+  0002D659  jne      0x18002d6f7
+  0002D65F  mov      eax, dword ptr [rbx + 0x28]
+  0002D662  test     eax, eax
+  0002D664  je       0x18002d6f7
+  0002D66A  mov      rdi, qword ptr [rbx + 0x18]
+  0002D66E  lea      rbp, [rdi + rax*8]
+  0002D672  cmp      rdi, rbp
+  0002D675  je       0x18002d6ea
+  0002D677  mov      eax, dword ptr [rbx + 0x10]
+  0002D67A  test     eax, eax
+  0002D67C  jne      0x18002d684
+  0002D67E  xor      esi, esi
+  0002D680  xor      ecx, ecx
+  0002D682  jmp      0x18002d68b
+  0002D684  mov      rcx, qword ptr [rbx]
+  0002D687  lea      rsi, [rcx + rax*8]
+  0002D68B  mov      r8, qword ptr [rdi]
+  0002D68E  mov      rdx, rsi
+  0002D691  call     0x18002d140
+  0002D696  cmp      rax, rsi
+  0002D699  jne      0x18002d6e1
+  0002D69B  mov      eax, dword ptr [rbx + 8]
+  0002D69E  cmp      dword ptr [rbx + 0x10], eax
+  0002D6A1  jne      0x18002d6cc
+  0002D6A3  test     eax, eax
+  0002D6A5  je       0x18002d6bf
+  0002D6A7  xorps    xmm0, xmm0
+  0002D6AA  cvtsi2ss xmm0, rax
+  0002D6AF  addss    xmm0, xmm0
+  0002D6B3  call     0x18006aa80
+  0002D6B8  cvttss2si rdx, xmm0
+  0002D6BD  jmp      0x18002d6c4
+  0002D6BF  mov      edx, 4
+  0002D6C4  mov      rcx, rbx
+  0002D6C7  call     0x18002df70
+  0002D6CC  mov      ecx, dword ptr [rbx + 0x10]
+  0002D6CF  lea      eax, [rcx + 1]
+  0002D6D2  mov      dword ptr [rbx + 0x10], eax
+  0002D6D5  mov      edx, ecx
+  0002D6D7  mov      rcx, qword ptr [rbx]
+  0002D6DA  mov      rax, qword ptr [rdi]
+  0002D6DD  mov      qword ptr [rcx + rdx*8], rax
+  0002D6E1  add      rdi, 8
+  0002D6E5  cmp      rdi, rbp
+  0002D6E8  jne      0x18002d677
+  0002D6EA  cmp      dword ptr [rbx + 0x28], 0
+  0002D6EE  je       0x18002d6f7
+  0002D6F0  mov      dword ptr [rbx + 0x28], 0
+  0002D6F7  mov      eax, dword ptr [rbx + 0x10]
+  0002D6FA  test     eax, eax
+  0002D6FC  je       0x18002d759
+  0002D6FE  mov      rdi, qword ptr [rbx]
+  0002D701  lea      rsi, [rdi + rax*8]
+  0002D705  cmp      rdi, rsi
+  0002D708  je       0x18002d759
+  0002D70A  nop      word ptr [rax + rax]
+  0002D710  mov      eax, dword ptr [rbx + 0x40]
+  0002D713  test     eax, eax
+  0002D715  jne      0x18002d720
+  0002D717  xor      edx, edx
+  0002D719  xor      r9d, r9d
+  0002D71C  xor      ebp, ebp
+  0002D71E  jmp      0x18002d72c
+  0002D720  mov      r9, qword ptr [rbx + 0x30]
+  0002D724  lea      rbp, [r9 + rax*8]
+  0002D728  lea      rdx, [r9 + rax*8]
+  0002D72C  mov      r8, qword ptr [rdi]
+  0002D72F  mov      rcx, r9
+  0002D732  call     0x18002d140
+  0002D737  cmp      rax, rbp
+  0002D73A  jne      0x18002d750
+  0002D73C  mov      rcx, qword ptr [rdi]
+  0002D73F  mov      rax, qword ptr [rcx]
+  0002D742  mov      r8, rbx
+  0002D745  mov      rdx, r15
+  0002D748  call     qword ptr [rax + 8]
+  0002D74B  cmp      eax, 1
+  0002D74E  je       0x18002d759
+  0002D750  add      rdi, 8
+  0002D754  cmp      rdi, rsi
+  0002D757  jne      0x18002d710
+  0002D759  mov      byte ptr [rbx + 0x50], r14b
+  0002D75D  test     r14b, r14b
+  0002D760  jne      0x18002d805
+  0002D766  mov      eax, dword ptr [rbx + 0x40]
+  0002D769  test     eax, eax
+  0002D76B  je       0x18002d805
+  0002D771  mov      rdi, qword ptr [rbx + 0x30]
+  0002D775  lea      rsi, [rdi + rax*8]
+  0002D779  cmp      rdi, rsi
+  0002D77C  je       0x18002d7f8
+  0002D77E  nop      
+  0002D780  mov      eax, dword ptr [rbx + 0x10]
+  0002D783  test     eax, eax
+  0002D785  jne      0x18002d78d
+  0002D787  xor      edx, edx
+  0002D789  xor      ecx, ecx
+  0002D78B  jmp      0x18002d794
+  0002D78D  mov      rcx, qword ptr [rbx]
+  0002D790  lea      rdx, [rcx + rax*8]
+  0002D794  mov      r8, qword ptr [rdi]
+  0002D797  call     0x18002d140
+  0002D79C  mov      r9, rax
+  0002D79F  mov      eax, dword ptr [rbx + 0x10]
+  0002D7A2  test     eax, eax
+  0002D7A4  jne      0x18002d7aa
+  0002D7A6  xor      eax, eax
+  0002D7A8  jmp      0x18002d7b4
+  0002D7AA  mov      rcx, rax
+  0002D7AD  mov      rax, qword ptr [rbx]
+  0002D7B0  lea      rax, [rax + rcx*8]
+  0002D7B4  cmp      r9, rax
+  0002D7B7  je       0x18002d7ef
+  0002D7B9  lea      rdx, [r9 + 8]
+  0002D7BD  nop      dword ptr [rax]
+  0002D7C0  mov      r8d, dword ptr [rbx + 0x10]
+  0002D7C4  test     r8d, r8d
+  0002D7C7  jne      0x18002d7cd
+  0002D7C9  xor      eax, eax
+  0002D7CB  jmp      0x18002d7d4
+  0002D7CD  mov      rax, qword ptr [rbx]
+  0002D7D0  lea      rax, [rax + r8*8]
+  0002D7D4  cmp      rdx, rax
+  0002D7D7  je       0x18002d7e8
+  0002D7D9  mov      rax, qword ptr [rdx]
+  0002D7DC  mov      qword ptr [r9], rax
+  0002D7DF  mov      r9, rdx
+  0002D7E2  add      rdx, 8
+  0002D7E6  jmp      0x18002d7c0
+  0002D7E8  lea      eax, [r8 - 1]
+  0002D7EC  mov      dword ptr [rbx + 0x10], eax
+  0002D7EF  add      rdi, 8
+  0002D7F3  cmp      rdi, rsi
+  0002D7F6  jne      0x18002d780
+  0002D7F8  cmp      dword ptr [rbx + 0x40], 0
+  0002D7FC  je       0x18002d805
+  0002D7FE  mov      dword ptr [rbx + 0x40], 0
+  0002D805  lea      rcx, [rsp + 0x40]
+  0002D80A  call     0x1800420b0
+  0002D80F  mov      rbx, qword ptr [rsp + 0x48]
+  0002D814  mov      rbp, qword ptr [rsp + 0x50]
+  0002D819  mov      rsi, qword ptr [rsp + 0x58]
+  0002D81E  add      rsp, 0x20
+  0002D822  pop      r15
+  0002D824  pop      r14
+  0002D826  pop      rdi
+  0002D827  ret      
+
+Target RVA 0x2da7b (VA 0x18002da7b)
+Pdata function range 0x2d830-0x2df6a (unwind 0xa59cc)
+Symbol/source mapping: PDB: hooks::SimulateStatePhysics; PhysicsHooks.cpp:41
+Disassembly window 0x2d9db-0x2db1b (function exceeds 0x300 bytes)
+  0002D9DB  je       0x18002da2d
+  0002D9DD  lea      rdx, [rsp + 0x38]
+  0002D9E2  mov      rcx, rax
+  0002D9E5  call     0x1800429f0
+  0002D9EA  nop      
+  0002D9EB  mov      qword ptr [rbp + 0x60], r15
+  0002D9EF  or       r12d, 1
+  0002D9F3  mov      dword ptr [rsp + 0x30], r12d
+  0002D9F8  lea      rdx, [rbp + 0x60]
+  0002D9FC  mov      rcx, rax
+  0002D9FF  call     0x1800422b0
+  0002DA04  test     rbx, rbx
+  0002DA07  je       0x18002da12
+  0002DA09  lea      rcx, [rbx + 0x20]
+  0002DA0D  call     0x1800424a0
+  0002DA12  mov      rbx, qword ptr [rbp + 0x60]
+  0002DA16  mov      qword ptr [rsp + 0x48], rbx
+  0002DA1B  mov      qword ptr [rbp + 0x60], r15
+  0002DA1F  and      r12d, 0xfffffffe
+  0002DA23  mov      dword ptr [rsp + 0x38], r15d
+  0002DA28  test     rbx, rbx
+  0002DA2B  jne      0x18002da3a
+  0002DA2D  add      r13, 8
+  0002DA31  cmp      r13, rsi
+  0002DA34  jne      0x18002d8e0
+  0002DA3A  mov      esi, 0x38
+  0002DA3F  lea      rcx, [rbp + 0x30]
+  0002DA43  call     0x1800420b0
+  0002DA48  mov      rdx, rbx
+  0002DA4B  lea      rcx, [rbp + 0x30]
+  0002DA4F  call     0x180024a80
+  0002DA54  nop      
+  0002DA55  mov      rdi, qword ptr [rbp + 0x30]
+  0002DA59  test     rdi, rdi
+  0002DA5C  je       0x18002da8f
+  0002DA5E  lea      rcx, [rdi + 0x68]
+  0002DA62  cmove    rcx, r15
+  0002DA66  xorps    xmm0, xmm0
+  0002DA69  movdqu   xmmword ptr [rbp + 0x40], xmm0
+  0002DA6E  mov      qword ptr [rbp + 0x50], r15
+  0002DA72  lea      rdx, [rbp + 0x40]
+  0002DA76  call     0x18002d620
+  0002DA7B  nop      
+  0002DA7C  lea      rcx, [rbp + 0x50]
+  0002DA80  call     0x1800230b0
+  0002DA85  lea      rcx, [rbp + 0x40]
+  0002DA89  call     0x1800230b0
+  0002DA8E  nop      
+  0002DA8F  test     rdi, rdi
+  0002DA92  je       0x18002dab5
+  0002DA94  lea      rcx, [rdi + 8]
+  0002DA98  call     0x180001370
+  0002DA9D  mov      ecx, 0xffffffff
+  0002DAA2  lock xadd dword ptr [rax], ecx
+  0002DAA6  cmp      ecx, 1
+  0002DAA9  jne      0x18002dab5
+  0002DAAB  mov      rax, qword ptr [rdi]
+  0002DAAE  mov      edx, ecx
+  0002DAB0  mov      rcx, rdi
+  0002DAB3  call     qword ptr [rax]
+  0002DAB5  mov      rax, qword ptr [r14]
+  0002DAB8  mov      rcx, r14
+  0002DABB  call     qword ptr [rax + 0x78]
+  0002DABE  mov      rdi, rax
+  0002DAC1  mov      qword ptr [rsp + 0x40], rax
+  0002DAC6  test     rax, rax
+  0002DAC9  je       0x18002dad4
+  0002DACB  mov      rcx, rax
+  0002DACE  call     0x180042c10
+  0002DAD3  nop      
+  0002DAD4  test     rdi, rdi
+  0002DAD7  je       0x18002de27
+  0002DADD  xorps    xmm6, xmm6
+  0002DAE0  movaps   xmmword ptr [rbp + 0x70], xmm6
+  0002DAE4  mov      rax, qword ptr [r14]
+  0002DAE7  mov      r8b, 1
+  0002DAEA  lea      rdx, [rbp + 0x70]
+  0002DAEE  mov      rcx, r14
+  0002DAF1  call     qword ptr [rax + 0x10]
+  0002DAF4  movss    xmm0, dword ptr [rbp + 0x78]
+  0002DAF9  mulss    xmm0, dword ptr [rip + 0x48f0f]
+  0002DB01  movss    dword ptr [r14 + 0x240], xmm0
+  0002DB0A  mov      rax, qword ptr [r14]
+  0002DB0D  lea      rdx, [rsp + 0x3c]
+  0002DB12  mov      rcx, r14
+  0002DB15  call     qword ptr [rax + 0x40]
+
