@@ -1,9 +1,8 @@
 #pragma once
 
-#include "utils/Trampoline.h"
+#include "HookInstallation.h"
 
 #include "GameABI.h"
-#include "MotionHookCode.h"
 #include "RE/B/BShkbAnimationGraph.h"
 #include "RE/H/hkbClipGenerator.h"
 #include "RE/H/hkbContext.h"
@@ -93,87 +92,29 @@ namespace hooks
 	void ClearMotionCache();
 	[[nodiscard]] bool HasAnimMotionData(const RE::hkbCharacter* a_hkbCharacter) noexcept;
 
-	static inline void Install()
+	[[nodiscard]] static inline amr::HookInstallation PrepareInstallation()
 	{
+		return amr::HookInstallation{
+			reinterpret_cast<std::uintptr_t>(&hkpCharacterContext::GetCharacterState_Hook),
+			reinterpret_cast<void*>(&hkbClipGenerator::ComputeStartTime_Hook),
+			reinterpret_cast<void*>(&hkbClipGenerator::ResetIgnoreStartTime_Hook),
+			reinterpret_cast<void*>(&MotionDataContainer::ProcessTranslationData_Hook),
+			reinterpret_cast<void*>(&MotionDataContainer::ProcessRotationData_Hook)
+		};
+	}
+
+	static inline void Install(amr::HookInstallation& a_installation)
+	{
+		static std::array<RUNTIME_FUNCTION, 4> functionTables{};
+		const auto originals = a_installation.Install(SKSE::GetTrampoline(), {
+			bhkCharacterController::UpdateStateAndMovement.address() + 0x7C2,
+			hkbClipGenerator::Activate.address() + 0x66E,
+			hkbClipGenerator::Deactivate.address() + 0x1A,
+			{ Character::ProcessMotionData.address() + 0x298, Character::ProcessMotionData.address() + 0x2AA,
+				Character::ProcessMotionData.address() + 0x35C, Character::ProcessMotionData.address() + 0x36D }
+		}, functionTables);
+		hkbClipGenerator::ComputeStartTime = originals.activate;
+		hkbClipGenerator::ResetIgnoreStartTime = originals.deactivate;
 		bhkCharacterStateOnGround::SimulateStatePhysics = bhkCharacterStateOnGround::vTable.write_vfunc(8, SimulateStatePhysics);
-
-		// bhkCharacterController::UpdateStateAndMovement
-		{
-			static std::uintptr_t hookedAddress = bhkCharacterController::UpdateStateAndMovement.address() + 0x7C2;
-
-			utils::AllocExactSizeTrampoline<5>();
-			SKSE::GetTrampoline().write_call<5>(hookedAddress, &hkpCharacterContext::GetCharacterState_Hook);
-		}
-
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		// hkbClipGenerator::Activate
-		{
-			static std::uintptr_t hookedAddress = hkbClipGenerator::Activate.address() + 0x66E;
-
-			struct Hook : Xbyak::CodeGenerator
-			{
-				Hook()
-				{
-					Xbyak::Label hookLabel;
-					mov(rdx, r15);	// r15 = hkbContext*
-					jmp(ptr[rip + hookLabel]);
-
-					L(hookLabel), dq(reinterpret_cast<std::uintptr_t>(&hkbClipGenerator::ComputeStartTime_Hook));
-				}
-			};
-
-			hkbClipGenerator::ComputeStartTime = utils::WriteCallTrampoline<5>(hookedAddress, Hook());
-		}
-
-		// hkbClipGenerator::Deactivate
-		{
-			static std::uintptr_t hookedAddress = hkbClipGenerator::Deactivate.address() + 0x1A;
-
-			struct Hook : Xbyak::CodeGenerator
-			{
-				Hook()
-				{
-					Xbyak::Label hookLabel;
-					mov(rdx, rsi);
-					jmp(ptr[rip + hookLabel]);
-
-					L(hookLabel), dq(reinterpret_cast<std::uintptr_t>(&hkbClipGenerator::ResetIgnoreStartTime_Hook));
-				}
-			};
-
-			hkbClipGenerator::ResetIgnoreStartTime = utils::WriteCallTrampoline<5>(hookedAddress, Hook());
-		}
-
-		// Character::ProcessMotionData
-		{
-			static std::uintptr_t translation1HookedAddress = Character::ProcessMotionData.address() + 0x298;
-			static std::uintptr_t translation2HookedAddress = Character::ProcessMotionData.address() + 0x2AA;
-			static std::uintptr_t rotation1HookedAddress = Character::ProcessMotionData.address() + 0x35C;
-			static std::uintptr_t rotation2HookedAddress = Character::ProcessMotionData.address() + 0x36D;
-
-			static std::array<RUNTIME_FUNCTION, 4> functionTables{};
-			const auto install = [](std::uintptr_t a_site, void* a_function, RUNTIME_FUNCTION& a_table) {
-				amr::MotionHookCode code(a_function);
-				code.ready();
-				SKSE::AllocTrampoline(utils::GetTrampolineBaseSize<5>() + code.getSize() + 15);
-				const auto allocation = reinterpret_cast<std::uintptr_t>(SKSE::GetTrampoline().allocate(code.getSize() + 15));
-				const auto address = (allocation + 15) & ~std::uintptr_t{ 15 };
-				std::memcpy(reinterpret_cast<void*>(address), code.getCode(), code.getSize());
-				a_table = { 0, code.bodySize, code.unwindOffset };
-				if (!RtlAddFunctionTable(&a_table, 1, address)) {
-					RE::stl::report_and_fail("Cannot register motion hook unwind information");
-				}
-				SKSE::GetTrampoline().write_call<5>(a_site, address);
-			};
-
-			// Translation
-			install(translation1HookedAddress, &MotionDataContainer::ProcessTranslationData_Hook, functionTables[0]);
-			install(translation2HookedAddress, &MotionDataContainer::ProcessTranslationData_Hook, functionTables[1]);
-
-			//// Rotation
-			install(rotation1HookedAddress, &MotionDataContainer::ProcessRotationData_Hook, functionTables[2]);
-			install(rotation2HookedAddress, &MotionDataContainer::ProcessRotationData_Hook, functionTables[3]);
-		}
 	}
 }

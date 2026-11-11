@@ -94,7 +94,8 @@ SKSEPluginLoad(const SKSE::LoadInterface* a_skse)
 
 	logger::info("Loading {} {}...", plugin->GetName(), plugin->GetVersion().string());
 
-	SKSE::Init(a_skse);
+	auto installation = hooks::PrepareInstallation();
+	SKSE::Init(a_skse, { .log = false, .trampoline = true, .trampolineSize = installation.RequiredSize() });
 	if (!SKSE::GetMessagingInterface()->RegisterListener("SKSE", OnSKSEMessage)) {
 		logger::critical("Failed to register SKSE messaging listener");
 		return false;
@@ -103,7 +104,8 @@ SKSEPluginLoad(const SKSE::LoadInterface* a_skse)
 	logger::set_level(settings::debug::logLevel, settings::debug::logLevel);
 	logger::info("Author branch b5be808 synchronized; runtime {}", REL::Module::get().version().string());
 
-	hooks::Install();
+	hooks::Install(installation);
+	logger::info("Trampoline installed: {} / {} bytes", SKSE::GetTrampoline().allocated_size(), SKSE::GetTrampoline().capacity());
 
 	logger::info("Successfully loaded");
 	return true;

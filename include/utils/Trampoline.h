@@ -35,37 +35,9 @@ namespace utils
 	}
 
 	template <std::size_t N>
-	static constexpr void AllocExactSizeTrampoline(Xbyak::CodeGenerator& a_hookCode)
+	static std::uintptr_t WriteCallTrampoline(SKSE::Trampoline& a_trampoline, std::uintptr_t a_location, Xbyak::CodeGenerator& a_hookCode)
 	{
-		a_hookCode.ready();
-
-		SKSE::AllocTrampoline(GetTrampolineBaseSize<N>() + a_hookCode.getSize());
-	}
-
-	template <std::size_t N>
-	static constexpr void AllocExactSizeTrampoline()
-	{
-		SKSE::AllocTrampoline(GetTrampolineBaseSize<N>());
-	}
-
-	template <std::size_t N>
-	static constexpr std::uintptr_t WriteBranchTrampoline(std::uintptr_t a_location, const Xbyak::CodeGenerator& a_hookCode)
-	{
-		auto& hookCode = const_cast<Xbyak::CodeGenerator&>(a_hookCode);
-		
-		AllocExactSizeTrampoline<N>(hookCode);
-
-		return SKSE::GetTrampoline().write_branch<N>(a_location, SKSE::GetTrampoline().allocate(hookCode));
-	}
-
-	template <std::size_t N>
-	static constexpr std::uintptr_t WriteCallTrampoline(std::uintptr_t a_location, const Xbyak::CodeGenerator& a_hookCode)
-	{
-		auto& hookCode = const_cast<Xbyak::CodeGenerator&>(a_hookCode);
-
-		AllocExactSizeTrampoline<N>(hookCode);
-
-		return SKSE::GetTrampoline().write_call<N>(a_location, SKSE::GetTrampoline().allocate(hookCode));
+		return a_trampoline.write_call<N>(a_location, a_trampoline.allocate(a_hookCode));
 	}
 }
 

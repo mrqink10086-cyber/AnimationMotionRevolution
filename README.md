@@ -155,6 +155,7 @@ https://www.nexusmods.com/skyrimspecialedition/mods/50258
 
 安装包交给模组管理器，或将包内 `SKSE` 目录放入游戏 `Data` 目录，覆盖旧 DLL。
 安装新配置前请合并自己的设置。此次同步说明、验证和限制见 [同步报告](docs/MAXSU-SYNC.md)。
+2026-11-11 修正了逐 hook 申请 trampoline 导致启动失败的问题；预算和回归证据见 [修复记录](docs/TRAMPOLINE-FIX-1170.md)。
 原有 [迁移报告](docs/MIGRATION-1170.md)、[优化报告](docs/OPTIMIZATION-1170.md) 和
 [安全审核报告](docs/SAFETY-AUDIT-1170.md) 记录同步前版本的证据；新增 warping 以同步报告为准。
 

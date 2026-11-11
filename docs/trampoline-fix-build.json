@@ -1,0 +1,22 @@
+{
+  "date": "2026-11-11",
+  "plugin_version": "2.0.1",
+  "runtime": "1.6.1170.0",
+  "minimum_skse": "2.2.6",
+  "configuration": "MSVC 19.44 x64 RelWithDebInfo; AMR_ENABLE_TRUEHUD_DEBUG=ON",
+  "dll_size": 755712,
+  "dll_sha256": "3cb27dcdcb5b15e40f1ba79c93d86c2f51775abf870cac09e1b6b6d6a117e71c",
+  "machine": "0x8664",
+  "exports": [
+    "RequestPluginAPI",
+    "SKSEPlugin_Load",
+    "SKSEPlugin_Query",
+    "SKSEPlugin_Version"
+  ],
+  "trampoline_reserved_bytes": 352,
+  "trampoline_allocated_bytes": 352,
+  "branch_pool_requests": 1,
+  "ctest_passed": 8,
+  "ctest_total": 8,
+  "game_tested": false
+}

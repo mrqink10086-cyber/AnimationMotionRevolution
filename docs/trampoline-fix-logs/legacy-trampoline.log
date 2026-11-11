@@ -1,0 +1,2 @@
+[2026-11-11 18:10:13.226] [critical] [Trampoline.cpp:164] Failed to handle allocation request
+Legacy allocation failure reproduced: pool requests=1, capacity=14, used=14
