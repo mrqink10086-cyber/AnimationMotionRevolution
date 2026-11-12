@@ -1,0 +1,52 @@
+{
+  "version": "2.0.4",
+  "runtime": "1.6.1170.0",
+  "minimumSKSE": "2.2.6",
+  "generatedAt": "2026-11-12T11:37:30.652475+00:00",
+  "baseCommit": "394d2f06cee24e9f7193348f2bc63bcfc261605d",
+  "dll": {
+    "bytes": 756736,
+    "sha256": "e8d9429295787c14435d98bab6891ebec18bfacd3fe10f90fd15df39852fb083"
+  },
+  "pdb": {
+    "bytes": 28372992,
+    "sha256": "ab1b1aa8e7275e167c668eb3883970c121cd1fd1abef0e428512f54a892d2e7f"
+  },
+  "tests": {
+    "ctestPassed": 11,
+    "ctestTotal": 11,
+    "asan": [
+      "graph_lifetime",
+      "snapshot"
+    ],
+    "nativeABI": {
+      "sites": 16,
+      "virtualEntries": 10,
+      "helpers": 8,
+      "lifecycleRelativeReferences": 9
+    },
+    "trampoline": {
+      "budgetBytes": 380,
+      "poolRequests": 1,
+      "unwindTables": 4
+    }
+  },
+  "sources": {
+    "CMakeLists.txt": "4381e682680b5abefa1f8a37cda1d8bd6b45ce57182a7aa6f00fcceccf170a09",
+    "README.md": "29e1133f569cc9a2ee10cd0fd9348d10b2f62455fddd5d2f0f7fb01e4f7e1b39",
+    "include/MotionCache.h": "9d09083f9373c17b9ec69deeecf450d3949dcfd3feb32b2ba14ae7069ea2e15a",
+    "include/ParsedAnimation.h": "17171997a24ea3091024154a4377f1e3b532b4c0dc35099d6cc68a8ecd553f81",
+    "include/Hooks.h": "0e566a2e23feab1449eeb790135d2cff98f3234a3e9ea853be98923690e3d052",
+    "include/HookInstallation.h": "3bb87a1dc3065a0211fce8675e94a46b8adcd8759ee750a2574f20cbe4e053f7",
+    "source/Hooks.cpp": "cb406b44937423983da1bbba8fe2dc089cb183a0f2c53c699391b60474921fb5",
+    "tests/cache_tests.cpp": "bfbf92bc919f9930701059e04db21700b5d52189571f05e9a8d3e99cb1c2be5f",
+    "tests/cache_exception_tests.cpp": "84a7ae08519935dc026deb29f0c625b26e6bb287d33d92246c9fc5121e15140d",
+    "tests/graph_lifetime_tests.cpp": "69612976e428aa06b7b74f81dbbe648f5b6d43f8ee0825b64e3caa8e25019903",
+    "tests/snapshot_tests.cpp": "23ddcc2acb7042a6d22c165d4f80b47915d467ea42fc874df0d37e662164e37f",
+    "tests/trampoline_tests.cpp": "bd8e783833f15c605a18607409df4a926f4028990ec42e0421ad760e510cde5b",
+    "tools/verify_1170.py": "d449e96a460a31172a0889ea1354596f4781b40cb27e92740b7aa8ad756d69f0"
+  },
+  "gameTested": false,
+  "deployed": false,
+  "committed": false
+}

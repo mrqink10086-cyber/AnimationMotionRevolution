@@ -129,13 +129,12 @@ int main()
 	int animationIdentity = 0;
 	OriginalShape original;
 	Cache cache;
-	const auto generation = cache.GetGeneration();
-	const std::shared_ptr<const void> graphOwner = std::make_shared<const int>(1);
 	for (std::size_t i = 0; i < kCharacterCount; ++i) {
 		const auto value = 1000 + i;
 		original.Insert(&characters[i], kClipName, value);
 		auto payload = std::make_shared<const Payload>(value);
-		cache.Activate(&characters[i], &graphIdentity, graphOwner, kClipName, &animationIdentity, std::move(payload), generation);
+		cache.RegisterCharacter(&characters[i]);
+		cache.Activate(cache.Begin(&characters[i], &graphIdentity), kClipName, &animationIdentity, std::move(payload));
 	}
 
 	std::cout << "Synthetic host cache lookup benchmark; no FPS claims\n";

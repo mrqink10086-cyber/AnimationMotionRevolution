@@ -1,0 +1,7 @@
+[1/7] Building CXX object CMakeFiles\AnimationMotionRevolution.dir\source\AnimationMotionRevolutionAPI.cpp.obj
+[2/7] Building CXX object CMakeFiles\AnimationMotionRevolution.dir\source\PhysicsHooks.cpp.obj
+[3/7] Building CXX object CMakeFiles\AnimationMotionRevolution.dir\source\Hooks.cpp.obj
+[4/7] Building CXX object CMakeFiles\AnimationMotionRevolution.dir\source\main.cpp.obj
+[5/7] Building CXX object CMakeFiles\amr_trampoline_tests.dir\tests\trampoline_tests.cpp.obj
+[6/7] Linking CXX shared library AnimationMotionRevolution.dll
+[7/7] Linking CXX executable amr_trampoline_tests.exe

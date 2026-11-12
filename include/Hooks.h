@@ -90,6 +90,10 @@ namespace hooks
 
 	void SimulateStatePhysics(RE::bhkCharacterStateOnGround* a_this, RE::bhkCharacterController* a_characterController);
 	void ClearMotionCache();
+	RE::BShkbAnimationGraph* CreateGraph(RE::BShkbAnimationGraph* a_graph, RE::TESObjectREFR* a_holder, bool a_flag);
+	void DestroyGraph(RE::BShkbAnimationGraph* a_graph);
+	inline REL::Relocation<decltype(&CreateGraph)> OriginalCreateGraph;
+	inline REL::Relocation<decltype(&DestroyGraph)> OriginalDestroyGraph;
 	[[nodiscard]] bool HasAnimMotionData(const RE::hkbCharacter* a_hkbCharacter) noexcept;
 
 	[[nodiscard]] static inline amr::HookInstallation PrepareInstallation()
@@ -99,7 +103,8 @@ namespace hooks
 			reinterpret_cast<void*>(&hkbClipGenerator::ComputeStartTime_Hook),
 			reinterpret_cast<void*>(&hkbClipGenerator::ResetIgnoreStartTime_Hook),
 			reinterpret_cast<void*>(&MotionDataContainer::ProcessTranslationData_Hook),
-			reinterpret_cast<void*>(&MotionDataContainer::ProcessRotationData_Hook)
+			reinterpret_cast<void*>(&MotionDataContainer::ProcessRotationData_Hook),
+			reinterpret_cast<std::uintptr_t>(&CreateGraph), reinterpret_cast<std::uintptr_t>(&DestroyGraph)
 		};
 	}
 
@@ -111,10 +116,21 @@ namespace hooks
 			hkbClipGenerator::Activate.address() + 0x66E,
 			hkbClipGenerator::Deactivate.address() + 0x1A,
 			{ Character::ProcessMotionData.address() + 0x298, Character::ProcessMotionData.address() + 0x2AA,
-				Character::ProcessMotionData.address() + 0x35C, Character::ProcessMotionData.address() + 0x36D }
+				Character::ProcessMotionData.address() + 0x35C, Character::ProcessMotionData.address() + 0x36D },
+			{ REL::Relocation<std::uintptr_t>{ REL::ID(20108) }.address() + 0x64,
+				REL::Relocation<std::uintptr_t>{ REL::ID(32973) }.address() + 0x5A,
+				REL::Relocation<std::uintptr_t>{ REL::ID(32989) }.address() + 0x5A,
+				REL::Relocation<std::uintptr_t>{ REL::ID(37979) }.address() + 0x7A,
+				REL::Relocation<std::uintptr_t>{ REL::ID(40753) }.address() + 0x64,
+				REL::Relocation<std::uintptr_t>{ REL::ID(63547) }.address() + 0x1F },
+			{ REL::Relocation<std::uintptr_t>{ REL::ID(63547) }.address() + 0x38,
+				REL::Relocation<std::uintptr_t>{ REL::ID(63758) }.address() + 0x19 },
+			REL::Relocation<std::uintptr_t>{ REL::Offset(0x166E737) }.address()
 		}, functionTables);
 		hkbClipGenerator::ComputeStartTime = originals.activate;
 		hkbClipGenerator::ResetIgnoreStartTime = originals.deactivate;
+		OriginalCreateGraph = originals.graphCreate;
+		OriginalDestroyGraph = originals.graphDestroy;
 		bhkCharacterStateOnGround::SimulateStatePhysics = bhkCharacterStateOnGround::vTable.write_vfunc(8, SimulateStatePhysics);
 	}
 }

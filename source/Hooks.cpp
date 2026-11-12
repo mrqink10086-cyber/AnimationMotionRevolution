@@ -2,6 +2,7 @@
 
 #include "AnimMotionHandler.h"
 #include "MotionCache.h"
+#include "ParsedAnimation.h"
 #include "Settings.h"
 #ifdef AMR_ENABLE_TRUEHUD_DEBUG
 #include "TrueHUDIntegration.h"
@@ -42,13 +43,7 @@ namespace hooks
 			}
 		}
 
-		struct ParsedAnimation
-		{
-			explicit ParsedAnimation(const RE::hkaAnimation* a_animation) : animation(a_animation) {}
-			RE::hkRefPtr<const RE::hkaAnimation> animation;
-			AnimMotionData motion;
-			bool hasVerticalMotion{ false };
-		};
+		using ParsedAnimation = amr::ParsedAnimation;
 
 		struct TranslationRuntimeState
 		{
@@ -79,7 +74,7 @@ namespace hooks
 			TranslationRuntimeState state;
 		};
 
-		using Cache = amr::MotionCache<ParsedAnimation, RE::hkRefPtr<const RE::hkbBehaviorGraph>, BindingRuntime>;
+		using Cache = amr::MotionCache<ParsedAnimation, BindingRuntime>;
 
 		Cache& GetCache()
 		{
@@ -102,8 +97,6 @@ namespace hooks
 		{
 			return !a_data.motion.translationList.empty() || !a_data.motion.rotationList.empty();
 		}
-
-		bool HasVerticalMotion(const std::vector<Translation>& a_motion);
 
 		bool AnyWarping(const RE::ActorHandle& a_actor)
 		{
@@ -154,7 +147,7 @@ namespace hooks
 					   nullptr;
 		}
 
-			void ComputeStartTimeHook(
+		void ComputeStartTimeHook(
 			const RE::hkbClipGenerator* a_clip,
 			const RE::hkbContext* a_context)
 		{
@@ -162,74 +155,43 @@ namespace hooks
 			const auto* hkbCharacter = a_context ? a_context->character : nullptr;
 			if (boundAnimation && hkbCharacter) {
 				Cache* activeCache = nullptr;
-				Cache::Generation generation{};
+				Cache::Ticket ticket{};
 				try {
 					auto& cache = GetCache();
 					activeCache = &cache;
-					generation = cache.GetGeneration();
-					auto parsed = cache.FindParsed(boundAnimation);
-					if (!parsed) {
-						auto fresh = std::make_shared<ParsedAnimation>(boundAnimation);
-						for (const auto& track : boundAnimation->annotationTracks) {
-							for (const auto& annotation : track.annotations) {
-								const auto annotationText = annotation.text.c_str();
-								const std::string_view text = annotationText ? std::string_view(annotationText) : std::string_view{};
-								const bool warpControl = IsWarpControlAnnotation(text);
-								if (warpControl) {
-									fresh->motion.MarkExplicitWarpControl();
-								}
-								const auto annotationData = ParseAnnotation(annotation);
-								if (const auto* translation = std::get_if<Translation>(&annotationData)) {
-									fresh->motion.Add(*translation);
-								} else if (const auto* rotation = std::get_if<Rotation>(&annotationData)) {
-									fresh->motion.Add(*rotation);
-								} else if (const auto* warp = std::get_if<Warp>(&annotationData)) {
-									if (!fresh->motion.Add(*warp)) {
-										logger::warn("Ignoring warp control with a non-finite timestamp in animation '{}': '{}'", a_clip->animationName.c_str(), text);
-									}
-								} else if (const auto* warpEnd = std::get_if<WarpEnd>(&annotationData)) {
-									if (!fresh->motion.Add(*warpEnd)) {
-										logger::warn("Ignoring warp control with a non-finite timestamp in animation '{}': '{}'", a_clip->animationName.c_str(), text);
-									}
-								} else if (warpControl) {
-									logger::warn("Ignoring malformed warp control in animation '{}' at {}: '{}'", a_clip->animationName.c_str(), annotation.time, text);
-								}
-								if (IsCombatWarpBoundary(text)) {
-									fresh->motion.AddCombatWarpBoundary(annotation.time);
-								}
+					ticket = cache.Begin(hkbCharacter, hkbCharacter->behaviorGraph.get());
+					auto parsed = amr::ParseAnimation(*boundAnimation, kVectorEpsilon,
+						[&](const auto& annotation, std::string_view text, bool nonFiniteTime) {
+							if (nonFiniteTime) {
+								logger::warn("Ignoring warp control with a non-finite timestamp in animation '{}': '{}'", a_clip->animationName.c_str(), text);
+							} else {
+								logger::warn("Ignoring malformed warp control in animation '{}' at {}: '{}'", a_clip->animationName.c_str(), annotation.time, text);
 							}
-						}
-						fresh->motion.Finalize();
-							fresh->hasVerticalMotion = HasVerticalMotion(fresh->motion.translationList);
-						parsed = cache.Remember(boundAnimation, std::move(fresh), generation);
+						});
+					const auto previous = cache.FindGeneratorBinding(
+						hkbCharacter, hkbCharacter->behaviorGraph.get(), ClipName(a_clip->name), a_clip);
+					RE::ActorHandle previousOwner{};
+					bool previousWasWarping = false;
+					if (previous.runtime) {
+						std::lock_guard guard(previous.runtime->mutex);
+						previousOwner = previous.runtime->state.owner;
+						previousWasWarping = previous.runtime->state.wasWarping;
 					}
-						const auto previous = cache.FindGeneratorBinding(
-							hkbCharacter, hkbCharacter->behaviorGraph.get(), ClipName(a_clip->name), a_clip);
-						RE::ActorHandle previousOwner{};
-						bool previousWasWarping = false;
-						if (previous.runtime) {
-							std::lock_guard guard(previous.runtime->mutex);
-							previousOwner = previous.runtime->state.owner;
-							previousWasWarping = previous.runtime->state.wasWarping;
-						}
-						bool bindingReplaced = false;
-					if (parsed && HasMotion(*parsed)) {
-							bindingReplaced = previous.data && previous.data->animation.get() != boundAnimation;
-						RE::hkRefPtr<const RE::hkbBehaviorGraph> graph(hkbCharacter->behaviorGraph.get());
-						cache.Activate(hkbCharacter, graph.get(), std::move(graph), ClipName(a_clip->name),
-							boundAnimation, std::move(parsed), generation, a_clip);
-						} else if (parsed) {
-							const auto retired = cache.DeactivateGenerator(
-								hkbCharacter, hkbCharacter->behaviorGraph.get(),
-								ClipName(a_clip->name), generation, a_clip);
-							UpdateWarpingForRemovedBindings(retired);
-						}
-						if (bindingReplaced && previousWasWarping && previousOwner) {
-							SetWarpingGraphVariable(previousOwner, AnyWarping(previousOwner));
+					bool bindingReplaced = false;
+					if (HasMotion(*parsed)) {
+						bindingReplaced = previous.data && previous.animation != boundAnimation;
+						cache.Activate(ticket, ClipName(a_clip->name), boundAnimation, std::move(parsed), a_clip);
+					} else {
+						const auto retired = cache.DeactivateGenerator(
+							ticket, ClipName(a_clip->name), a_clip);
+						UpdateWarpingForRemovedBindings(retired);
+					}
+					if (bindingReplaced && previousWasWarping && previousOwner) {
+						SetWarpingGraphVariable(previousOwner, AnyWarping(previousOwner));
 					}
 				} catch (const std::exception& error) {
 					if (activeCache) {
-						activeCache->RetireCharacter(hkbCharacter, generation, [](const Cache::RuntimeOwner& runtime) {
+						activeCache->RetireCharacter(ticket, [](const Cache::RuntimeOwner& runtime) {
 							RE::ActorHandle owner{};
 							{
 								std::lock_guard guard(runtime->mutex);
@@ -243,7 +205,7 @@ namespace hooks
 					logger::error("Cannot cache animation {}: {}", a_clip->animationName.c_str(), error.what());
 				}
 			}
-				hkbClipGenerator::ComputeStartTime(a_clip);
+			hkbClipGenerator::ComputeStartTime(a_clip);
 		}
 
 		void ResetIgnoreStartTimeHook(
@@ -254,14 +216,14 @@ namespace hooks
 			const auto* hkbCharacter = a_context ? a_context->character : nullptr;
 			if (boundAnimation && hkbCharacter) {
 				auto& cache = GetCache();
-				const auto generation = cache.GetGeneration();
+				const auto ticket = cache.GetTicket(hkbCharacter, hkbCharacter->behaviorGraph.get());
 				auto binding = cache.FindBinding(hkbCharacter, hkbCharacter->behaviorGraph.get(), ClipName(a_clip->name), boundAnimation, a_clip);
 				RE::ActorHandle owner{};
 				if (binding.runtime) {
 					std::lock_guard guard(binding.runtime->mutex);
 					owner = binding.runtime->state.owner;
 				}
-				cache.Deactivate(hkbCharacter, hkbCharacter->behaviorGraph.get(), ClipName(a_clip->name), boundAnimation, generation, a_clip);
+				cache.Deactivate(ticket, ClipName(a_clip->name), boundAnimation, a_clip);
 				if (owner) {
 					SetWarpingGraphVariable(owner, AnyWarping(owner));
 				}
@@ -294,16 +256,6 @@ namespace hooks
 					settings::motionWarping::defaultMaximumAngleDegrees,
 				.maximumDistance = std::numeric_limits<float>::infinity()
 			};
-		}
-
-		bool HasVerticalMotion(const std::vector<Translation>& a_motion)
-		{
-			return std::any_of(
-				a_motion.begin(),
-				a_motion.end(),
-				[](const Translation& a_key) {
-					return std::abs(a_key.delta.z) > kVectorEpsilon;
-				});
 		}
 
 		struct ActiveWarpSegment
@@ -1032,6 +984,23 @@ namespace hooks
 			RE::Character* a_character)
 		{
 			ProcessRotationDataHook(a_this, a_motionTime, a_rotation, a_clipName, a_character);
+		}
+
+		RE::BShkbAnimationGraph* CreateGraph(RE::BShkbAnimationGraph* a_graph, RE::TESObjectREFR* a_holder, bool a_flag)
+		{
+			auto* graph = OriginalCreateGraph(a_graph, a_holder, a_flag);
+			try {
+				GetCache().RegisterCharacter(&graph->characterInstance);
+			} catch (const std::exception& error) {
+				logger::error("Cannot register animation graph: {}", error.what());
+			}
+			return graph;
+		}
+
+		void DestroyGraph(RE::BShkbAnimationGraph* a_graph)
+		{
+			GetCache().UnregisterCharacter(&a_graph->characterInstance);
+			OriginalDestroyGraph(a_graph);
 		}
 
 		void ClearMotionCache()

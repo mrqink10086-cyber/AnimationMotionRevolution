@@ -1,0 +1,19 @@
+{
+  "version": "2.0.3",
+  "runtime": "1.6.1170.0",
+  "baseCommit": "394d2f06cee24e9f7193348f2bc63bcfc261605d",
+  "dllBytes": 752640,
+  "dllSha256": "942f65da5a19d056b0ead19958c5c547907a996b58c3dda0248cf7545bcb5796",
+  "hostTests": {
+    "passed": 10,
+    "total": 10
+  },
+  "snapshotAddressSanitizer": "passed",
+  "gameTested": false,
+  "deployed": false,
+  "changes": [
+    "No hkaAnimation reference in parsed snapshots",
+    "No pointer-keyed parsed LRU",
+    "Parse current annotations on every activation"
+  ]
+}

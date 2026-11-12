@@ -6,3 +6,5 @@ x64/
 *.pdb
 *.exe
 /*.log
+__pycache__/
+*.py[cod]
